@@ -1,0 +1,29 @@
+# Use the official Jupyter minimal notebook as a base image
+FROM jupyter/minimal-notebook
+
+RUN mamba install --quiet --yes \
+    jupyterlab \
+    pandas numpy scipy matplotlib seaborn scikit-learn statsmodels ipython-sql \
+    sqlalchemy pyodbc && \
+    pip install jupyterlab-sql \
+    && mamba clean --all -f -y
+
+EXPOSE 8888
+
+#Установим драйвер для базы данных SQL Server
+
+COPY setup_db_driver.sh /tmp/setup_db_driver.sh
+
+#ADD  ETL_template.ipynb /home/jovyan/work/ETL_template.ipynb
+
+USER root
+
+#lsb-release иначе  odbc драйвер не установится 
+RUN apt-get update
+RUN apt-get install -y lsb-release 
+RUN chmod +x /tmp/setup_db_driver.sh 
+RUN /tmp/setup_db_driver.sh
+USER ${NB_USER}
+
+# Set the default command to start JupyterLab
+CMD ["jupyter", "lab", "--ip=0.0.0.0"]
