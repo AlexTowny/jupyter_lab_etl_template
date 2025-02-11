@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  jupyter_lab:
+    build: jupyter_lab/
+    restart: always
+    ports:
+      - 80:8888
+    volumes:
+      - jupyter_lab:/home/
+ 
+volumes:
+  jupyter_lab:
+
